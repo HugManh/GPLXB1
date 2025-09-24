@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, homeStylesheet, Image } from 'react-native';
-import { TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { homeStyles } from '../../assets/styles/home.styles';
+import { Stack } from 'expo-router';
 
 class Category extends React.Component {
   constructor(props) {
@@ -17,37 +17,9 @@ class Category extends React.Component {
   }
 }
 
-const HomeScreen = () => {
-  // constructor(props) {
-  //   super(props);
-
-  //   this.state = {
-  //     GridListItems: [
-  //       {icon:"", key: "THI SÁT HẠNH" },
-  //       {icon:"", key: "HỌC LÝ THUYẾT" },
-  //       {icon:"", key: "BIỂN BÁO ĐƯỜNG BỘ" },
-  //       {icon:"", key: "MẸO THI KẾT QUẢ CAO" },
-  //       {icon:"", key: "TRA CỨU LUẬT (NĐ 100/2019/" },
-  //       {icon:"", key: "CÁC CÂU HAY SAI" },
-  //     ]
-  //   };
-  // }
-  // GetGridViewItem(item) {
-  //   Alert.alert(item);
-  // }
+const Home = () => {
   return (
     <View style={homeStyles.container}>
-      {/* <StatusBar
-                    barStyle = "light-content"
-                    hidden = {false}
-                    backgroundColor = "#4cb050"
-                    translucent = {false}
-                 />
-                 <View style={homeStyles.Header}>
-                //    <Icon name='ios-menu' size={40} color='white' onPress={() => navigation.openDrawer()} />
-                   <Text style={homeStyles.textHeader}>Ôn thi giấy phép lái xe</Text>
-                 </View> */}
-
       <View style={{ backgroundColor: '#31edd1', flex: 3.5 }}>
         <Image
           source={require('../../assets/images/img1.jpg')}
@@ -90,27 +62,22 @@ const HomeScreen = () => {
             // press={() => navigation.navigate('Taplo')}
           />
         </View>
-        {/* <FlatList
-                      data={ this.state.GridListItems }
-                      renderItem={ ({item}) =>
-                        <View style={homeStyles.GridViewContainer}>
-                          <Image />
-                          <Text style={homeStyles.GridViewTextLayout} onPress={this.GetGridViewItem.bind(this, item.key)} > {item.key} </Text>
-                        </View> }
-                      numColumns={3}
-                  /> */}
       </View>
       <View style={{ flex: 2 }}>
         <Image
           style={{ width: '100%', height: '100%', resizeMode: 'cover' }}
           source={require('../../assets/images/img2.webp')}
         />
-        {/* <TouchableOpacity style={homeStyles.addButton}>
-              <Text style={homeStyles.iconButton}>+</Text>
-            </TouchableOpacity> */}
       </View>
     </View>
   );
 };
 
-export default HomeScreen;
+const styles = StyleSheet.create({
+  image: {
+    width: 50,
+    height: 50,
+  },
+});
+
+export default Home;

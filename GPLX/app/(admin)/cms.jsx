@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useEffect, useState } from 'react';
-import { fetchSigns } from '../../handlers/signsHandlers';
+import { getAllSignsPage } from '../../services/firestoreService';
 import { useRouter } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
 
@@ -25,7 +25,7 @@ const CMSScreen = () => {
     if (loading || !hasMore) return;
     setLoading(true);
     try {
-      const data = await fetchSigns(PAGE_SIZE, cursors);
+      const data = await getAllSignsPage(PAGE_SIZE, cursors);
       // data = { ban: {items, lastVisible}, command: {items, lastVisible}, ... }
 
       const merged = Object.entries(data).flatMap(([type, value]) =>

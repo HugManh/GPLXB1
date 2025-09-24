@@ -10,7 +10,10 @@ import {
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { fetchSignItem, updateSign } from '../../handlers/signsHandlers';
+import {
+  getSignItemById,
+  updateSignItemById,
+} from '../../services/firestoreService';
 
 const EditScreen = () => {
   const router = useRouter();
@@ -26,7 +29,7 @@ const EditScreen = () => {
 
   useEffect(() => {
     const loadItem = async () => {
-      const data = await fetchSignItem(type, id);
+      const data = await getSignItemById(type, id);
       if (!data) {
         router.back();
         return;
@@ -40,7 +43,7 @@ const EditScreen = () => {
 
   const handleSave = async () => {
     if (!item.name.trim()) return;
-    await updateSign(type, id, item);
+    await updateSignItemById(type, id, item);
     router.back();
   };
 
