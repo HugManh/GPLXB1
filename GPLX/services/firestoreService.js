@@ -1,5 +1,5 @@
 // src/services/firestoreService.js
-import { collection, doc, getDoc, getDocs, query, orderBy, limit, startAfter, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, orderBy, limit, startAfter, updateDoc, addDoc, setDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 
 // Lấy items theo page
@@ -68,6 +68,25 @@ export const updateSignItemById = async (type, id, data) => {
     } catch (err) {
         // eslint-disable-next-line no-console
         console.error("Error updating sign item:", err);
+        throw err;
+    }
+};
+
+export const createSignItem = async (type, data) => {
+    try {
+        if (!type) throw new Error("createSignItem: 'type' is required");
+        if (!data || typeof data !== 'object') throw new Error("createSignItem: 'data' must be an object");
+        const colRef = collection(db, "signs", type, "items");
+        if (data.id) {
+            const docRef = doc(colRef, String(data.id));
+            await setDoc(docRef, data);
+            return { id: String(data.id), ...data };
+        }
+        const docRef = await addDoc(colRef, data);
+        return { id: docRef.id, ...data };
+    } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error("Error creating sign item:", err);
         throw err;
     }
 };

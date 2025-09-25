@@ -8,7 +8,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useEffect, useState } from 'react';
-import { getAllSignsPage } from '../../services/firestoreService';
+import { getAllSignsPage, createSignItem } from '../../services/firestoreService';
+import SignList from '../../components/SignList';
 import { useRouter } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
 
@@ -17,6 +18,7 @@ const CMSScreen = () => {
   const [cursors, setCursors] = useState({}); // lưu lastVisible cho từng type
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [activeType, setActiveType] = useState('all');
   const router = useRouter();
   const isFocused = useIsFocused();
   const PAGE_SIZE = 10;
@@ -32,7 +34,11 @@ const CMSScreen = () => {
         (value.items || []).map((item) => ({ ...item, type }))
       );
 
-      setSigns((prev) => [...prev, ...merged]);
+      setSigns((prev) => {
+        const existingKeys = new Set(prev.map((i) => `${i.type}_${i.id}`));
+        const incoming = merged.filter((i) => !existingKeys.has(`${i.type}_${i.id}`));
+        return [...prev, ...incoming];
+      });
 
       // cập nhật cursors
       const newCursors = { ...cursors };
@@ -72,6 +78,12 @@ const CMSScreen = () => {
     });
   };
 
+  const handleCreate = async () => {
+    router.push({ pathname: '/(admin)/edit', params: { type: 'ban' } });
+  };
+
+  const filtered = activeType === 'all' ? signs : signs.filter(s => s.type === activeType);
+
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       {item.image ? (
@@ -96,17 +108,21 @@ const CMSScreen = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={signs}
-        keyExtractor={(item) => `${item.type}_${item.id}`}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContainer}
-        onEndReached={loadSigns}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={
-          loading ? <ActivityIndicator size='small' /> : null
-        }
-      />
+      <View style={styles.toolbar}>
+        <TouchableOpacity style={[styles.typeBtn, activeType==='all' && styles.typeBtnActive]} onPress={() => setActiveType('all')}>
+          <Text style={styles.typeText}>All</Text>
+        </TouchableOpacity>
+        {['ban','command','danger','instruction'].map(t => (
+          <TouchableOpacity key={t} style={[styles.typeBtn, activeType===t && styles.typeBtnActive]} onPress={() => setActiveType(t)}>
+            <Text style={styles.typeText}>{t}</Text>
+          </TouchableOpacity>
+        ))}
+        <View style={{flex:1}} />
+        <TouchableOpacity style={styles.addBtn} onPress={handleCreate}>
+          <Text style={{color:'#fff', fontWeight:'bold'}}>+ New</Text>
+        </TouchableOpacity>
+      </View>
+      <SignList data={filtered} onEdit={handleEdit} onEndReached={loadSigns} loading={loading} />
     </View>
   );
 };
