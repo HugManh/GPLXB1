@@ -13,12 +13,14 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   getSignItemById,
   updateSignItemById,
+  createSignItem,
 } from '../../services/firestoreService';
+import SignForm from '../../components/SignForm';
 
 const EditScreen = () => {
   const router = useRouter();
   const { id, type } = useLocalSearchParams();
-  const [item, setItem] = useState({ name: '', content: '', image: '' });
+  const [item, setItem] = useState({ name: '', content: '', image: '', type: type || '' });
   const [originalItem, setOriginalItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [focusKeys, setFocusKeys] = useState({
@@ -29,6 +31,10 @@ const EditScreen = () => {
 
   useEffect(() => {
     const loadItem = async () => {
+      if (!id) {
+        setLoading(false);
+        return;
+      }
       const data = await getSignItemById(type, id);
       if (!data) {
         router.back();
@@ -43,7 +49,14 @@ const EditScreen = () => {
 
   const handleSave = async () => {
     if (!item.name.trim()) return;
-    await updateSignItemById(type, id, item);
+    if (id) {
+      await updateSignItemById(item.type || type, id, item);
+    } else {
+      const created = await createSignItem(item.type || type, item);
+      if (created?.id) {
+        // optional: navigate back or to detail
+      }
+    }
     router.back();
   };
 
@@ -93,28 +106,7 @@ const EditScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {renderInput('Name', 'name')}
-      {renderInput('Content', 'content', true)}
-      {renderInput('Image URL', 'image')}
-
-      {item.image ? (
-        <Image source={{ uri: item.image }} style={styles.imagePreview} />
-      ) : null}
-
-      <View style={styles.buttonRow}>
-        <Pressable
-          style={[styles.button, styles.resetButton]}
-          onPress={handleReset}
-        >
-          <Text style={styles.buttonText}>Reset</Text>
-        </Pressable>
-        <Pressable
-          style={[styles.button, styles.saveButton]}
-          onPress={handleSave}
-        >
-          <Text style={styles.buttonText}>Save Changes</Text>
-        </Pressable>
-      </View>
+      <SignForm value={item} onChange={setItem} onSubmit={handleSave} onReset={handleReset} submitLabel={id ? 'Save Changes' : 'Create'} />
     </ScrollView>
   );
 };
