@@ -1,6 +1,6 @@
 // src/services/firestoreService.js
-import { collection, doc, getDoc, getDocs, query, orderBy, limit, startAfter, updateDoc, addDoc, setDoc } from "firebase/firestore";
-import { db } from "../config/firebase";
+import { addDoc, collection, doc, getDoc, getDocs, limit, orderBy, query, setDoc, startAfter, updateDoc } from "firebase/firestore";
+import { db } from "../config/firebaseConfig";
 
 // Lấy items theo page
 export const getSignItemsPage = async (colName, pageSize = 10, lastDoc = null) => {
@@ -20,8 +20,10 @@ export const getSignItemsPage = async (colName, pageSize = 10, lastDoc = null) =
 };
 
 // Lấy tất cả loại sign (có thể dùng pageSize và cursor nếu cần)
+export const SIGN_TYPES = ["ban", "command", "danger", "instruction"];
+
 export const getAllSignsPage = async (pageSize = 10, cursors = {}) => {
-    const signTypes = ["ban", "command", "danger", "instruction"];
+    const signTypes = SIGN_TYPES;
 
     const resultsArray = await Promise.all(
         signTypes.map(async (type) => {
